@@ -1,14 +1,18 @@
 // import {Alert} from 'react-native';
-import { BaseApiResponse, IBaseApiError } from '@/types/BaseApi';
-import { extractErrorMessage } from '@/utils/extractErrorMessage';
+import { useBoundStore } from "@/store/store";
+import { BaseApiResponse, IBaseApiError } from "@/types/BaseApi";
+import { isAuthWhitelisted } from "@/utils/authHeader";
+import { extractErrorMessage } from "@/utils/extractErrorMessage";
 import axios, {
   AxiosError,
   AxiosResponse,
   InternalAxiosRequestConfig,
-} from 'axios';
+} from "axios";
+import { use } from "react";
+import { toast } from "react-toastify";
 
 // Set in .env file
-const API_BASE_URL = 'https://localhost:5001/api';
+const API_BASE_URL = "http://localhost:5001/api";
 
 const BlogBaseApiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,13 +20,15 @@ const BlogBaseApiClient = axios.create({
 
 BlogBaseApiClient.interceptors.request.use(
   (request: InternalAxiosRequestConfig) => {
-    if (request.url !== '/auth/login') {
-      
+    const accessToken = useBoundStore.getState().accessToken;
+    if (request.url && !isAuthWhitelisted(request.url)) {
+      if (accessToken) {
+        request.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
-
     return request;
   },
-  error => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 BlogBaseApiClient.interceptors.response.use(
@@ -32,24 +38,24 @@ BlogBaseApiClient.interceptors.response.use(
       const status = error.response.status;
       const message = extractErrorMessage(error.response.data);
 
+      toast(message);
       switch (status) {
         case 401:
           console.error(message);
-          
+
           break;
         case 400:
         case 502:
           // Alert.alert('Error Happened', message);
-          
+
           break;
         default:
-         
-        console.log(error);
+          console.log(error);
       }
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default BlogBaseApiClient;

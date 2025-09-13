@@ -1,10 +1,19 @@
 "use client";
+import { LOGIN, SINUP } from "@/constant/modelType";
+import { verifyEmail, verifyLoginOtp } from "@/services/authService";
+import { useBoundStore } from "@/store/store";
+  import {  toast } from 'react-toastify';
 
 import React, { useRef } from "react";
 
-export default function OTPForm() {
+export default function OTPForm({
+  mode,
+}: {
+  mode: typeof LOGIN | typeof SINUP;
+}) {
   const length = 6;
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const { setAccessToken, signupData, closeModal } = useBoundStore();
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -68,10 +77,36 @@ export default function OTPForm() {
     document.getElementById("otp-submit")?.focus();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const otp = inputsRef.current.map((input) => input?.value || "").join("");
     console.log("Submitted OTP:", otp);
+    let response;
+    try {
+      if (!signupData?.email) {
+        console.error("No email found for OTP verification.");
+        return;
+      }
+      console.log("Signup Data:", mode,SINUP);
+      if (mode === SINUP) {
+        console.log("Verifying OTP for signup:", signupData.email, otp);
+        
+        response = await verifyEmail(signupData.email, otp);
+      } else {
+        // Call verify OTP API for login
+        response = await verifyLoginOtp(signupData.email, otp);
+
+        console.log("Verifying OTP for login:", response);
+      }
+      if (response?.data?.accessToken) {
+        setAccessToken(response.data.accessToken);
+      }
+       toast.success("Logged in successfully!")
+      closeModal()
+      console.log("OTP verification response:", response);
+    } catch (err) {
+      console.error("OTP submission error:", err);
+    }
   };
 
   return (

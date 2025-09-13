@@ -2,6 +2,8 @@ import { BaseApiResponse } from "@/types/BaseApi";
 import BlogBaseApiClient from "./BlogBaseApiClient";
 import {
   ILoginRequestOtpResponseData,
+  ILogoutResponseData,
+  IProfileData,
   ISignupResponseData,
   IVerifyEmailResponseData,
 } from "@/types/auth";
@@ -46,7 +48,7 @@ export const loginRequest = async (
   return response;
 };
 
-export const verifyOtp = async (
+export const verifyLoginOtp = async (
   email: string,
   otp: string
 ): Promise<BaseApiResponse<IVerifyEmailResponseData>> => {
@@ -57,6 +59,33 @@ export const verifyOtp = async (
 
     otp,
   });
+
+  return response;
+};
+export const logout = async (): Promise<
+  BaseApiResponse<ILogoutResponseData>
+> => {
+  const { data: response } = await BlogBaseApiClient.post<
+    BaseApiResponse<ILogoutResponseData>
+  >("/auth/logout");
+
+  return response;
+};
+export const logoutAll = async (): Promise<
+  BaseApiResponse<ILogoutResponseData>
+> => {
+  const { data: response } = await BlogBaseApiClient.post<
+    BaseApiResponse<ILogoutResponseData>
+  >("/auth/logout-all");
+
+  return response;
+};
+export const getProfile = async (): Promise<
+  BaseApiResponse<IProfileData>
+> => {
+  const { data: response } = await BlogBaseApiClient.get<
+    BaseApiResponse<IProfileData>
+  >("/auth/profile");
 
   return response;
 };

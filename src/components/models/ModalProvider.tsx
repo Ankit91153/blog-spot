@@ -28,7 +28,7 @@ export function ModalProvider() {
         </DialogHeader>
 
         {modalType === LOGIN && <SignInForm />}
-        {modalType === OTP && <OTPForm/>}
+        {modalType === OTP && <OTPForm mode={data?.mode}/>}
         {modalType === SINUP && <SignUpForm/>}
       </DialogContent>
     </Dialog>

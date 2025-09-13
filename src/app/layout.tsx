@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import Navbar from "@/components/navbar/Navbar";
 import { ModalProvider } from "@/components/models/ModalProvider";
 import Footer from "@/components/footer/Footer";
+import { ToastContainer } from "react-toastify";
+import AppInitializer from "@/components/common/AppInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +35,11 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
+          <AppInitializer />
           <div className="pt-24">{children}</div>
-          <Footer/>
-           <ModalProvider />
+          <Footer />
+          <ModalProvider />
+          <ToastContainer />
         </ThemeProvider>
       </body>
     </html>

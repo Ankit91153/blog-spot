@@ -83,3 +83,5 @@ export const siteMetadata = {
   `,
   tags: ["static-site", "javascript", "build-tools"],
 };
+
+export const AVATAR_URL="https://ui-avatars.com/api/"
